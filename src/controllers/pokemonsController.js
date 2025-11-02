@@ -3,10 +3,11 @@ const db = require('../models/db');
 const uuidv4 = require('uuid').v4;
 
 async function listCaptured(req, res) {
-  const trainerId = req.trainerId;
-  const trainer = db.trainers.find(t => t.id === String(trainerId));
-  if (!trainer) return res.status(404).json({ error: 'trainer not found' });
-  return res.json({ captures: trainer.captures || [] });
+  const usuarioId = req.trainerId;
+  const user = db.usuarios.find(u => u.id === String(usuarioId));
+  if (!user) return res.status(404).json({ error: 'user not found' });
+  const captures = db.pokemons_capturados.filter(c => c.usuarioId === String(usuarioId));
+  return res.json({ captures });
 }
 
 async function addCapture(req, res) {

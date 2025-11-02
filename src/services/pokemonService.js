@@ -14,39 +14,42 @@ function totalSpecies() {
   return pokemons.length;
 }
 
-function addCapture(trainerId, capture) {
-  const trainer = db.trainers.find(t => t.id === String(trainerId));
-  if (!trainer) throw new Error('trainer not found');
+function addCapture(usuarioId, capture) {
+  // validate user exists
+  const user = db.usuarios.find(u => u.id === String(usuarioId));
+  if (!user) throw new Error('user not found');
   if (capture.sex !== 'M' && capture.sex !== 'F') throw new Error('sex must be "M" or "F"');
   const species = getById(Number(capture.pokemonId));
   if (!species) throw new Error('pokemonId does not exist in Kanto');
-  if (trainer.captures.find(c => c.captureId === String(capture.captureId))) throw new Error('capture id already exists');
-  trainer.captures.push({ captureId: String(capture.captureId), pokemonId: Number(capture.pokemonId), sex: capture.sex, level: Number(capture.level) });
-  return trainer.captures[trainer.captures.length - 1];
+  if (db.pokemons_capturados.find(c => c.captureId === String(capture.captureId))) throw new Error('capture id already exists');
+  const registro = {
+    captureId: String(capture.captureId),
+    usuarioId: String(usuarioId),
+    pokemonId: Number(capture.pokemonId),
+    sex: capture.sex,
+    level: Number(capture.level)
+  };
+  db.pokemons_capturados.push(registro);
+  return registro;
 }
 
-function updateCaptureLevel(trainerId, captureId, level) {
-  const trainer = db.trainers.find(t => t.id === String(trainerId));
-  if (!trainer) return null;
-  const cap = trainer.captures.find(c => c.captureId === String(captureId));
-  if (!cap) return null;
-  cap.level = Number(level);
-  return cap;
+function updateCaptureLevel(usuarioId, captureId, level) {
+  const registro = db.pokemons_capturados.find(c => c.captureId === String(captureId) && c.usuarioId === String(usuarioId));
+  if (!registro) return null;
+  registro.level = Number(level);
+  return registro;
 }
 
-function deleteCapture(trainerId, captureId) {
-  const trainer = db.trainers.find(t => t.id === String(trainerId));
-  if (!trainer) return false;
-  const idx = trainer.captures.findIndex(c => c.captureId === String(captureId));
+function deleteCapture(usuarioId, captureId) {
+  const idx = db.pokemons_capturados.findIndex(c => c.captureId === String(captureId) && c.usuarioId === String(usuarioId));
   if (idx === -1) return false;
-  trainer.captures.splice(idx, 1);
+  db.pokemons_capturados.splice(idx, 1);
   return true;
 }
 
-function speciesCount(trainerId) {
-  const trainer = db.trainers.find(t => t.id === String(trainerId));
-  if (!trainer) return { uniqueSpeciesCount: 0 };
-  const unique = new Set(trainer.captures.map(c => Number(c.pokemonId)));
+function speciesCount(usuarioId) {
+  const capturas = db.pokemons_capturados.filter(c => c.usuarioId === String(usuarioId));
+  const unique = new Set(capturas.map(c => Number(c.pokemonId)));
   return { uniqueSpeciesCount: unique.size };
 }
 
