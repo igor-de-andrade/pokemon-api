@@ -1,0 +1,217 @@
+openapi: 3.0.0
+info:
+  title: Pokémon API
+  version: 1.0.0
+  description: API REST para registrar pokémons capturados na região de Kanto
+
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: Autenticação
+    description: Endpoints de autenticação (login)
+  - name: Usuários
+    description: Endpoints para registro e gerenciamento de treinadores
+  - name: Pokémons
+    description: Endpoints para gerenciar capturas e consultar o progresso do treinador
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    TrainerRegister:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        nickname:
+          type: string
+        sex:
+          type: string
+        initialPokemon:
+          type: integer
+      required: [login, password, nickname, sex]
+
+    TrainerResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        login:
+          type: string
+        nickname:
+          type: string
+        sex:
+          type: string
+
+    LoginRequest:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required: [login, password]
+
+    CaptureInput:
+      type: object
+      properties:
+        pokemonId:
+          type: integer
+        sex:
+          type: string
+        level:
+          type: integer
+      required: [pokemonId, sex, level]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+
+paths:
+  /users/register:
+    post:
+      tags:
+        - Usuários
+      summary: Registrar treinador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrainerRegister'
+      responses:
+        '201':
+          description: Trainer criado com token
+        '400':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Autenticação
+      summary: Autenticar treinador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: token JWT
+        '401':
+          description: credenciais inválidas
+
+  /pokemons:
+    get:
+      tags:
+        - Pokémons
+      summary: Listar pokémons capturados do treinador autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: lista de capturas
+        '401':
+          description: não autorizado
+
+    post:
+      tags:
+        - Pokémons
+      summary: Registrar captura de um pokémon
+      description: O campo captureId é gerado automaticamente pela API. Envie apenas pokemonId, sex e level.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CaptureInput'
+      responses:
+        '201':
+          description: captura registrada
+        '400':
+          description: input inválido
+
+  /pokemons/{captureId}/level:
+    put:
+      tags:
+        - Pokémons
+      summary: Atualizar nível do pokémon capturado
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: captureId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                level:
+                  type: integer
+      responses:
+        '200':
+          description: captura atualizada
+        '404':
+          description: captura não encontrada
+
+  /pokemons/{captureId}:
+    delete:
+      tags:
+        - Pokémons
+      summary: Excluir captura
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: captureId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: captura removida
+        '404':
+          description: não encontrada
+
+  /pokemons/species/count:
+    get:
+      tags:
+        - Pokémons
+      summary: Quantidade de espécies capturadas
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: contagem de espécies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  captured:
+                    type: integer
+                  total:
+                    type: integer
+        '401':
+          description: não autorizado
