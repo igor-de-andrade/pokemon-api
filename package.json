@@ -5,6 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/server.js",
+    "start:graphql": "node src/graphql/server.js",
+    "start:rest": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
   "keywords": [],
@@ -16,6 +18,7 @@
     "jsonwebtoken": "^9.0.0",
     "swagger-ui-express": "^4.6.2",
     "uuid": "^8.3.2",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "apollo-server-express": "^3.12.0"
   }
 }

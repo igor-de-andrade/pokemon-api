@@ -60,3 +60,103 @@ Próximos passos sugeridos
 - Persistência em arquivo ou banco real
 - Validações mais completas e testes automatizados
 - Dockerfile e integração contínua
+
+---
+
+## API GraphQL (Apollo Server)
+
+A API GraphQL está na pasta `graphql/` e utiliza Apollo Server + Express.
+
+### Instalação das dependências GraphQL
+
+```powershell
+npm install apollo-server-express@3.12.0 express@4.18.2 bcryptjs jsonwebtoken uuid
+```
+
+### Como rodar a API GraphQL
+
+```powershell
+node graphql/server.js
+```
+
+Acesse o playground em:
+- http://localhost:4000/graphql
+
+### Exemplos de Queries e Mutations
+
+#### Registrar usuário
+```graphql
+mutation {
+  register(login: "ash2", password: "pikachu123", nickname: "Ash", sex: "M", initialPokemon: 1) {
+    token
+  }
+}
+```
+
+#### Login
+```graphql
+query {
+  login(login: "ash2", password: "pikachu123") {
+    token
+  }
+}
+```
+
+#### Listar capturas (autenticado)
+```graphql
+query {
+  captures {
+    captureId
+    pokemonId
+    sex
+    level
+  }
+}
+```
+
+#### Adicionar captura (autenticado)
+```graphql
+mutation {
+  addCapture(pokemonId: 25, sex: "M", level: 5) {
+    captureId
+    pokemonId
+    sex
+    level
+  }
+}
+```
+
+#### Atualizar nível de captura (autenticado)
+```graphql
+mutation {
+  updateCaptureLevel(captureId: "<id>", level: 10) {
+    captureId
+    level
+  }
+}
+```
+
+#### Excluir captura (autenticado)
+```graphql
+mutation {
+  deleteCapture(captureId: "<id>")
+}
+```
+
+#### Contagem de espécies capturadas (autenticado)
+```graphql
+query {
+  speciesCount {
+    captured
+    total
+  }
+}
+```
+
+### Autenticação nas Mutations
+Para Mutations protegidas, envie o token JWT no header:
+```
+Authorization: Bearer <token>
+```
+
+---
