@@ -7,18 +7,25 @@
     "start": "node src/server.js",
     "start:graphql": "node src/graphql/server.js",
     "start:rest": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "test": "mocha test/**/*.test.js --timeout 10000",
+    "test:rest": "mocha test/rest/**/*.test.js --timeout 10000"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "apollo-server-express": "^3.12.0",
     "bcryptjs": "^2.4.3",
+    "dotenv-cli": "^10.0.0",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "swagger-ui-express": "^4.6.2",
     "uuid": "^8.3.2",
-    "yamljs": "^0.3.0",
-    "apollo-server-express": "^3.12.0"
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "mocha": "^11.7.1",
+    "supertest": "^7.1.4"
   }
 }

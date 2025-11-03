@@ -1,0 +1,18 @@
+{
+    "user": {
+        "login": "ash",
+        "password": "pikachu123"
+    },
+
+    "ashPokemonList": {
+        "captures": [
+            {
+                "captureId": "init-1",
+                "usuarioId": "1",
+                "pokemonId": 25,
+                "sex": "M",
+                "level": 5
+            }
+        ]
+    }
+}
