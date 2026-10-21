@@ -8,7 +8,8 @@
     "start:graphql": "node src/graphql/server.js",
     "start:rest": "node src/server.js",
     "test": "mocha test/**/*.test.js --timeout 10000",
-    "test:rest": "mocha test/rest/**/*.test.js --timeout 10000"
+    "test:rest": "mocha test/rest/**/*.test.js --timeout 10000",
+    "test:graphql": "mocha test/graphql/**/*.test.js --timeout 10000"
   },
   "keywords": [],
   "author": "",

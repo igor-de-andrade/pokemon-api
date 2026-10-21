@@ -1,0 +1,60 @@
+// Supertest -> Requisições
+// Chai -> Validações
+// Mocha -> Roda os testes
+
+const request = require('supertest')
+const { expect } = require('chai')
+
+describe('Mutation - AddCapture', () => {
+
+    let token
+
+    before(async () => {
+        const resposta = await request('http://localhost:4000')
+            .post('/graphql')
+            .send({
+                query: `
+                    mutation Login($login: String!, $password: String!) {
+                        login(login: $login, password: $password) {
+                            token
+                        }
+                    }
+                `,
+                variables: {
+                    "login": "ash",
+                    "password": "pikachu123"
+                }
+            })
+        
+        expect(resposta.status).to.eq(200)
+        expect(resposta.body.data.login).to.have.property('token')
+        expect(resposta.body.data.login.token).to.be.a('string')
+        expect(resposta.body.data.login.token).to.contain('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9')
+        token = resposta.body.data.login.token
+    })
+    it('deve capturar um pokémon com sucesso quando informo dados válidos', async () => {
+        const resposta = await request('http://localhost:4000')
+            .post('/graphql')
+            .set({
+                'Authorization': `Bearer ${token}`
+            })
+            .send({
+                query: `
+                    mutation AddCapture($pokemonId: Int!, $sex: String!, $level: Int!) {
+                        addCapture(pokemonId: $pokemonId, sex: $sex, level: $level) {
+                            captureId
+                            pokemonId
+                        }
+                    }
+                `,
+                variables: {
+                    "pokemonId": 7,
+                    "sex": "M",
+                    "level": 5
+                }
+            })
+        
+        expect(resposta.status).to.eq(200)
+        expect(resposta.body.data.addCapture).to.have.property('captureId')
+    })
+})
